@@ -46,6 +46,49 @@ def get_noise():
     return coeffs
 
 
+
+#Name:        hw
+#Description: Compute the Hamming weight of a byte
+def hw(a):
+    r = 0
+    for i in range(8):
+        r += (a>>i) & 1
+    return r
+
+
+#Description: Sample a polynomial deterministically from a seed and a nonce,
+#             with output polynomial close to centered binomial distribution
+#              with parameter k=8
+# Arguments:   - r:  output polynomial
+#              - seed: input seed
+#              - nonce: one-byte input nonce
+def poly_sample(seed, nonce):
+
+    #if NEWHOPE_K != 8
+    #error "poly_sample in poly.c only supports k=8"
+    #endif
+    #buf[128], a, b;
+    buf = []
+    r = [0 for i in range(params.N)]
+    a, b = 0
+
+    #extseed[NEWHOPE_SYMBYTES+2];
+    extseed = []
+
+    for i in range(params.NEWHOPE_SEEDBYTES):
+        extseed.append(seed[i])
+    extseed.append(nonce);
+    for i in range(params.N/64):
+        extseed.append(i)
+        hashing_algorithm = hashlib.shake_256()
+        hashing_algorithm.update(seed)
+        buf = hashing_algorithm.digest(128)
+        for j in range(64):
+            a = buf[2*j]
+            b = buf[2*j+1]
+            r[64*i+j] = hw(a) + params.Q - hw(b);
+    return r
+
 # keygen is a server-side function that generates the private key s_hat and
 # returns a message in the form of a tuple. This message should be encoded using
 # JSON or another portable format and transmitted (over an open channel) to the

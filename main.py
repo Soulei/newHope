@@ -15,7 +15,7 @@ if __name__ == "__main__":
     print("Bob's key is ")
     print(str(newHope.b_key))
 
-    #Comparing if the two hashes of the keys keys are equal
+    #Comparing if the two keys are equal
     count_eq = 0
     for i, c in enumerate(newHope.a_key):
         if newHope.b_key[i] == c:
